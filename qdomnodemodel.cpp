@@ -75,33 +75,21 @@ QXmlNodeModelIndex::DocumentOrder QDomNodeModel::compareOrder (
 	if (n1 == n2)
 		return QXmlNodeModelIndex::Is;
 
-	Path p1 = path(n1);
-	Path p2 = path(n2);
+	int l1 = n1.lineNumber();
+	int c1 = n1.columnNumber();
+	int l2 = n2.lineNumber();
+	int c2 = n2.columnNumber();
 
-	for (int i = 1; i < p1.size(); i++)
-		if (p1[i] == n2)
-			return QXmlNodeModelIndex::Follows;
+	if ( l1 < l2 )
+		return QXmlNodeModelIndex::Precedes;
 
-	for (int i = 1; i < p2.size(); i++)
-		if (p2[i] == n1)
-			return QXmlNodeModelIndex::Precedes;
+	if ( l1 > l2 )
+		return QXmlNodeModelIndex::Follows;
 
-	for (int i = 1; i < p1.size(); i++)
-		for (int j = 1; j < p2.size(); j++)
-		{
-			if (p1[i] == p2[j]) // Common ancestor
-			{
-				int ci1 = childIndex(p1[i-1]);
-				int ci2 = childIndex(p2[j-1]);
-
-				if (ci1 < ci2)
-					return QXmlNodeModelIndex::Precedes;
-				else
-					return QXmlNodeModelIndex::Follows;
-			}
-		}
-
-	return QXmlNodeModelIndex::Precedes; // Should be impossible!
+	if ( l1 == l2 && c1 < c2 )
+		return QXmlNodeModelIndex::Precedes;
+	else
+		return QXmlNodeModelIndex::Follows;
 }
 
 QUrl QDomNodeModel::documentUri (const QXmlNodeModelIndex&) const
